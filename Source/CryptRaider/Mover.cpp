@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Mover.h"
+#include "Math/UnrealMathUtility.h"
 
 // Sets default values for this component's properties
 UMover::UMover()
@@ -18,20 +18,30 @@ UMover::UMover()
 void UMover::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	
+
+	// Obtém a localização original do ator no início do jogo.
+	OriginalLocation = GetOwner()->GetActorLocation();
 }
-
-
 // Called every frame
 void UMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (ShouldMove)
+	{
+		// Obtém a localização atual do ator.
+		FVector CurrentLocation = GetOwner()->GetActorLocation();
 
-	AActor* Owner = GetOwner();
-	FVector OwnerVector = Owner->GetActorLocation();
-	FString OwnerVectorString = OwnerVector.ToCompactString(OwnerVector);
+		// Calcula a localização alvo para o movimento.
+		FVector TargetLocation = OriginalLocation + MoveOffset;
 
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *OwnerVectorString);
+		// Calcula a velocidade necessária para atingir o alvo dentro do tempo definido.
+		float Speed = FVector::Distance(OriginalLocation, TargetLocation) / MoveTime;
+	
+		// Interpola linearmente a localização atual para a localização alvo usando velocidade constante.
+		FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, Speed);
+		
+		// Aplica a nova localização ao ator para realizar o movimento.
+		GetOwner()->SetActorLocation(NewLocation);
+	}
+
 }
-
