@@ -4,7 +4,7 @@
 #include "Grabber.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h"
-#include "Camera/CameraComponent.h"
+
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
@@ -35,13 +35,30 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	//Draw Debug Line
 	FVector Start;
 	FVector End;
-	UCameraComponent* CameraComponent = GetOwner()->FindComponentByClass<UCameraComponent>();
-	if (CameraComponent)
-	{
-		Start = GetOwner()->GetActorLocation();
-		End = (CameraComponent->GetForwardVector() * MaxGrabDistance) + Start;
+		Start = GetComponentLocation();
+		End = Start + GetForwardVector() * MaxGrabDistance;
 		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false,1);
+
+		float Damage;
+	if (HasDamage(Damage))
+	{
+		PrintDamage(Damage);
 	}
-	
+
+	UE_LOG(LogTemp, Display, TEXT("Original Damage: %f"), Damage);
 }
+
+void UGrabber::PrintDamage(const float& Damage)
+{
+//	Damage = 2;
+	UE_LOG(LogTemp, Display, TEXT("Damage: %f"), Damage);
+}
+
+bool UGrabber::HasDamage(float& OutDamage)
+{
+	OutDamage = 5;
+	return true;
+}
+
+	
 
